@@ -1,5 +1,7 @@
-#TODO Some kernel specialists has to make it build
-Summary:	Kernel modules for Lustre®
+# TODO
+# - Some kernel specialists has to make it build
+Summary:	Kernel modules for Lustre(R)
+Summary(en.UTF-8):	Kernel modules for Lustre®
 Summary(pl.UTF-8):	Moduły kernela dla Lustre®
 Name:		lustre
 Version:	1.6.4.1
@@ -8,7 +10,6 @@ License:	GPL v2
 Group:		Base/Kernel
 Source0:	http://www.clusterfs.com/downloads/public/Lustre/v1.6/Production/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	e9d383eb48f6d41ff1a2dce4ae474415
-##Requires:	-kernel with lustre compiled in
 URL:		http://www.clusterfs.com/scalable-storage.html
 BuildRequires:	kernel%{_alt_kernel}-module-build
 BuildRequires:	rpmbuild(macros) >= 1.379
@@ -20,6 +21,14 @@ multi-network, fault-tolerant, POSIX1-compliant network file system
 for Linux clusters. Lustre® is a complete, software-only, open-source
 solution for any hardware that can run Linux. It has native drivers
 for many of the fastest networking fabrics. Lustre® can use any
+storage medium that looks like a block device.
+
+%description -l en.UTF-8
+Kernel modules for Lustre(R) Lustre(R) is a high-performance,
+multi-network, fault-tolerant, POSIX1-compliant network file system
+for Linux clusters. Lustre(R) is a complete, software-only, open-source
+solution for any hardware that can run Linux. It has native drivers
+for many of the fastest networking fabrics. Lustre(R) can use any
 storage medium that looks like a block device.
 
 %description -l pl.UTF-8
