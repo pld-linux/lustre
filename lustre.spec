@@ -29,7 +29,7 @@ plików dla klastrów Linuxowych. Lustre® jest kompletnym,
 wyłącznie programowym, open-source'owym rozwiazaniem dla każdego
 sprzętu który pracuje pod Linuxem. Posiada natywne sterowniki dla
 wielu najszybszych sieci. Lustre® może używać każdego madium
-które zachowuje się jak użądzenie blokowe.
+które zachowuje się jak urządzenie blokowe.
 
 %prep
 %setup -q
