@@ -1,0 +1,45 @@
+Disable LP64 ABI-dependent functions from API when building on e.g. ILP32 archs
+--- lustre-release-cac870c/lustre/utils/liblustreapi_swap.c.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/utils/liblustreapi_swap.c	2024-05-20 18:33:20.563568251 +0200
+@@ -348,6 +348,7 @@ int llapi_group_lock(int fd, int gid)
+ 	return rc;
+ }
+ 
++#ifdef __LP64__
+ int llapi_group_lock64(int fd, __u64 gid)
+ {
+ 	int rc;
+@@ -364,6 +365,7 @@ int llapi_group_lock64(int fd, __u64 gid
+ 	}
+ 	return rc;
+ }
++#endif
+ 
+ /**
+  * Put group lock.
+@@ -386,6 +388,7 @@ int llapi_group_unlock(int fd, int gid)
+ 	return rc;
+ }
+ 
++#ifdef __LP64__
+ int llapi_group_unlock64(int fd, __u64 gid)
+ {
+ 	int rc;
+@@ -397,3 +400,4 @@ int llapi_group_unlock64(int fd, __u64 g
+ 	}
+ 	return rc;
+ }
++#endif
+--- lustre-release-cac870c/lustre/include/lustre/lustreapi.h.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/include/lustre/lustreapi.h	2024-05-20 18:36:52.786571879 +0200
+@@ -654,8 +654,10 @@ int llapi_lease_put(int fd); /* obsolete
+ /* Group lock */
+ int llapi_group_lock(int fd, int gid);
+ int llapi_group_unlock(int fd, int gid);
++#ifdef __LP64__
+ int llapi_group_lock64(int fd, __u64 gid);
+ int llapi_group_unlock64(int fd, __u64 gid);
++#endif
+ 
+ bool llapi_file_is_sparse(int fd);
+ off_t llapi_data_seek(int src_fd, off_t offset, size_t *length);

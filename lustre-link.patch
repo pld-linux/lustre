@@ -1,0 +1,18 @@
+--- lustre-release-cac870c/lnet/utils/lnetconfig/Makefile.am.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lnet/utils/lnetconfig/Makefile.am	2024-05-20 18:08:18.831319015 +0200
+@@ -33,7 +33,7 @@ liblnetconfig_la_SOURCES  = liblnetconfi
+ 			    liblnetconfig_udsp.c liblnetconfig_netlink.c
+ liblnetconfig_la_CPPFLAGS = -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 \
+ 			    -DLUSTRE_UTILS=1 $(LIBNL3_CFLAGS) -fPIC
+-liblnetconfig_la_LDFLAGS = -L$(top_builddir)/libcfs/libcfs -lyaml -lm \
++liblnetconfig_la_LDFLAGS = -lyaml -lm \
+ 			   $(LIBREADLINE) -version-info 4:0:0
+ liblnetconfig_la_LIBADD = $(top_builddir)/libcfs/libcfs/libcfs.la \
+ 			  $(LIBNL3_LIBS)
+--- lustre-release-cac870c/lustre/utils/lustre.pc.in.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/utils/lustre.pc.in	2024-05-20 20:05:12.307651345 +0200
+@@ -8,3 +8,4 @@ Description: Library that applications c
+ Version: @PACKAGE_VERSION@
+ Cflags: -I${includedir}/lustre
+ Libs: -L${libdir} -llustreapi
++Libs.private: -llnetconfig -lyaml

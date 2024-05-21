@@ -1,0 +1,159 @@
+--- lustre-release-cac870c/libcfs/include/libcfs/libcfs_cpu.h.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/libcfs/include/libcfs/libcfs_cpu.h	2024-05-20 17:26:23.682439108 +0200
+@@ -305,7 +305,7 @@ struct workqueue_struct *cfs_cpt_bind_wo
+ 	struct workqueue_attrs attrs = { };
+ 	struct workqueue_struct *wq;
+ 
+-	wq = alloc_workqueue(wq_name, WQ_UNBOUND | flags, nthrs);
++	wq = alloc_workqueue("%s", WQ_UNBOUND | flags, nthrs, wq_name);
+ 	if (!wq)
+ 		return ERR_PTR(-ENOMEM);
+ 
+--- lustre-release-cac870c/lustre/utils/lfs.c.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/utils/lfs.c	2024-05-20 18:17:43.426251832 +0200
+@@ -2699,7 +2699,7 @@ new_comp:
+ 		rc = llapi_layout_comp_extent_set(layout, prev_end,
+ 						  comp_end);
+ 		if (rc) {
+-			fprintf(stderr, "Set extent [%lu, %lu) failed. %s\n",
++			fprintf(stderr, "Set extent [%"PRIu64", %"PRIu64") failed. %s\n",
+ 				prev_end, comp_end, strerror(errno));
+ 			return rc;
+ 		}
+@@ -2786,7 +2786,7 @@ new_comp:
+ 		rc = llapi_layout_stripe_size_set(layout, size);
+ 
+ 	if (rc) {
+-		fprintf(stderr, "Set stripe size %lu failed: %s\n",
++		fprintf(stderr, "Set stripe size %"PRIu64" failed: %s\n",
+ 			size, strerror(errno));
+ 		return rc;
+ 	}
+@@ -3232,7 +3232,7 @@ static int layout_adjust_first_extent(ch
+ 
+ 	if (start > prev_end || end < prev_end) {
+ 		fprintf(stderr,
+-			"%s setstripe: first extent [%lu, %lu) not adjacent with extent end %lu\n",
++			"%s setstripe: first extent [%"PRIu64", %"PRIu64") not adjacent with extent end %"PRIu64"\n",
+ 			progname, start, end, prev_end);
+ 		return -EINVAL;
+ 	}
+@@ -3240,7 +3240,7 @@ static int layout_adjust_first_extent(ch
+ 	rc = llapi_layout_comp_extent_set(layout, prev_end, end);
+ 	if (rc) {
+ 		fprintf(stderr,
+-			"%s setstripe: cannot set component extent [%lu, %lu): %s\n",
++			"%s setstripe: cannot set component extent [%"PRIu64", %"PRIu64"): %s\n",
+ 			progname, prev_end, end, strerror(errno));
+ 		return rc;
+ 	}
+@@ -11085,7 +11085,7 @@ static inline int lfs_mirror_read(int ar
+ 
+ 		if (written != bytes_read) {
+ 			fprintf(stderr,
+-		"%s %s: written %ld bytes does not match with %ld read.\n",
++		"%s %s: written %zd bytes does not match with %zd read.\n",
+ 				progname, argv[0], written, bytes_read);
+ 			rc = -EIO;
+ 			goto free_buf;
+--- lustre-release-cac870c/lustre/utils/llsom_sync.c.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/utils/llsom_sync.c	2024-05-20 18:30:09.526728906 +0200
+@@ -272,10 +272,10 @@ static int lsom_update_one(struct fid_re
+ 
+ 	llapi_printf(LLAPI_MSG_DEBUG,
+ 		     "record %llu:%llu, updated LSOM for fid " DFID
+-		     " size:%lu blocks:%lu\n",
++		     " size:%llu blocks:%llu\n",
+ 		     (unsigned long long)f->fr_time,
+ 		     (unsigned long long)f->fr_index,
+-		     PFID(&f->fr_fid), st.st_size, st.st_blocks);
++		     PFID(&f->fr_fid), (unsigned long long)st.st_size, (unsigned long long)st.st_blocks);
+ 
+ clean_up:
+ 	rc = llapi_changelog_clear(opt.o_mdtname,
+--- lustre-release-cac870c/lustre/utils/lhsmtool_posix.c.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/utils/lhsmtool_posix.c	2024-05-20 18:37:39.159967695 +0200
+@@ -2014,7 +2014,7 @@ static int ct_archive_upgrade_dir(int ar
+ 	}
+ 
+ 	while ((d = readdir(dir)) != NULL) {
+-		CT_TRACE("archive upgrade found %s '%s' (%ld)\n",
++		CT_TRACE("archive upgrade found %s '%s' (%"PRId64")\n",
+ 			 d_type_name(d->d_type), d->d_name, d->d_ino);
+ 
+ 		switch (d->d_type) {
+@@ -2031,12 +2031,12 @@ static int ct_archive_upgrade_dir(int ar
+ 						     dirfd(dir), d->d_name);
+ 			if (rc2 < 0) {
+ 				rc = rc2;
+-				CT_ERROR(rc, "cannot upgrade dir '%s' (%ld)",
++				CT_ERROR(rc, "cannot upgrade dir '%s' (%"PRId64")",
+ 					 d->d_name, d->d_ino);
+ 			}
+ 
+ 			rc2 = unlinkat(dirfd(dir), d->d_name, AT_REMOVEDIR);
+-			CT_TRACE("unlink dir '%s' (%ld): %s",
++			CT_TRACE("unlink dir '%s' (%"PRId64"): %s",
+ 				 d->d_name, d->d_ino, strerror(rc2 < 0 ? errno: 0));
+ 			if (rc2 < 0 && errno != ENOTEMPTY)
+ 				rc = -errno;
+@@ -2051,7 +2051,7 @@ static int ct_archive_upgrade_dir(int ar
+ 			break;
+ 		default:
+ ignore:
+-			CT_TRACE("ignoring unexpected %s '%s' (%ld) in archive",
++			CT_TRACE("ignoring unexpected %s '%s' (%"PRId64") in archive",
+ 				 d_type_name(d->d_type), d->d_name, d->d_ino);
+ 			break;
+ 		}
+--- lustre-release-cac870c/lustre/tests/lockahead_test.c.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/tests/lockahead_test.c	2024-05-20 18:45:26.591009301 +0200
+@@ -40,6 +40,7 @@
+ #include <unistd.h>
+ #include <poll.h>
+ #include <time.h>
++#include <inttypes.h>
+ 
+ #include <lustre/lustreapi.h>
+ #include <linux/lustre/lustre_idl.h>
+@@ -1182,10 +1183,10 @@ static int test23(void)
+ 		mainpath2, strerror(errno));
+ 
+ 	ASSERTF(sb.st_size == sb2.st_size,
+-		"size on %s and %s differs: %lu vs %lu",
++		"size on %s and %s differs: %"PRIu64" vs %"PRIu64,
+ 		mainpath, mainpath2, sb.st_size, sb2.st_size);
+ 
+-	ASSERTF(sb.st_size == write_size, "size %lu != bytes written (%lu)",
++	ASSERTF(sb.st_size == write_size, "size %"PRIu64" != bytes written (%zu)",
+ 		sb.st_size, write_size);
+ 
+ 	close(fd);
+--- lustre-release-cac870c/lustre/tests/expand_truncate_test.c.orig	2023-12-23 04:15:24.000000000 +0100
++++ lustre-release-cac870c/lustre/tests/expand_truncate_test.c	2024-05-20 18:49:47.303013091 +0200
+@@ -1,6 +1,7 @@
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <errno.h>
++#include <inttypes.h>
+ #include <sys/file.h>
+ 
+ int main(int argc, char **argv)
+@@ -24,7 +25,7 @@ int main(int argc, char **argv)
+ 
+ 	off = 1021 * 1024 * 1024;
+ 	if (ftruncate(fd, off) < 0) {
+-		fprintf(stderr, "ftruncate %ld failed:%d\n", off, errno);
++		fprintf(stderr, "ftruncate %"PRId64" failed:%d\n", (int64_t)off, errno);
+ 		rc = -1;
+ 		goto close;
+ 	}
+@@ -32,7 +33,7 @@ int main(int argc, char **argv)
+ 	off -= 4;
+ 	off = lseek(fd, off, SEEK_SET);
+ 	if (off == (off_t)-1) {
+-		fprintf(stderr, "lseek %ld failed:%d\n", off, errno);
++		fprintf(stderr, "lseek %"PRId64" failed:%d\n", (int64_t)off, errno);
+ 		rc = -1;
+ 		goto close;
+ 	}
