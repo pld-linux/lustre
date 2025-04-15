@@ -15,22 +15,22 @@ Summary:	Linux kernel modules for Lustre(R) file system
 Summary(en.UTF-8):	Linux kernel modules for Lustre® file system
 Summary(pl.UTF-8):	Moduły jądra Linuksa dla systemu plików Lustre®
 Name:		lustre
-Version:	2.15.4
+Version:	2.15.6
 # commit hash taken from tag at https://git.whamcloud.com/?p=fs/lustre-release.git;a=summary
-%define	gitref	cac870cf4d2bd9905b1b2bbe563defe6d748ac94
+%define	gitref	f7948c626181cda1f72d148adc73ad499eb60307
 %define	shortref	%(echo %{gitref} | cut -c1-7)
 Release:	0.1
 License:	GPL v2
 Group:		Base/Kernel
 Source0:	https://git.whamcloud.com/?p=fs/lustre-release.git;a=snapshot;h=%{gitref};sf=tgz#/%{name}-%{version}.tar.gz
-# Source0-md5:	346030ff22e4187a9fdc2ca26424f0ee
+# Source0-md5:	46b284ae56669a4b28a007dc6bf72b9c
 Patch0:		%{name}-format.patch
 Patch1:		%{name}-snmp.patch
 Patch2:		%{name}-32bit.patch
 Patch3:		%{name}-tests.patch
 Patch4:		%{name}-link.patch
 Patch5:		%{name}-configure.patch
-Patch6:		%{name}-zfs.patch
+Patch6:		%{name}-warnings.patch
 Patch7:		%{name}-heimdal.patch
 URL:		https://www.lustre.org/
 BuildRequires:	autoconf >= 2.57
@@ -197,6 +197,9 @@ CPPFLAGS="%{rpmcppflags} -I$(pwd)/lnet/include/uapi -I$(pwd)/lustre/include/uapi
 	--with-bash-completion-dir=%{bash_compdir} \
 	--with-linux-obj=%{_kernelsrcdir} \
 	--with-systemdsystemunitdir=%{systemdunitdir}
+
+# broken configure check - messed kernel and userspace buildsystems
+%{__sed} -i -e 's/.*HAVE_ZFS_NVLIST_CONST_INTERFACES.*/#define HAVE_ZFS_NVLIST_CONST_INTERFACES 1/' config.h
 
 %{__make}
 

@@ -1,0 +1,20 @@
+--- lustre-release-f7948c6/libcfs/libcfs/util/nidstrings.c.orig	2024-11-27 23:19:27.000000000 +0100
++++ lustre-release-f7948c6/libcfs/libcfs/util/nidstrings.c	2025-04-15 05:45:21.684896793 +0200
+@@ -302,7 +302,7 @@ libcfs_ip_addr_range_expand(struct list_
+ static int
+ libcfs_ip_addr_range_print(char *buffer, int count, struct list_head *list)
+ {
+-	int i = 0, j = 0;
++	int i = 0;
+ 	struct cfs_expr_list *el;
+ 
+ 	list_for_each_entry(el, list, el_link) {
+@@ -461,7 +461,7 @@ static int
+ libcfs_num_addr_range_print(char *buffer, int count, struct list_head *list)
+ {
+ 	struct cfs_expr_list *el;
+-	int i = 0, j = 0;
++	int i = 0;
+ 
+ 	list_for_each_entry(el, list, el_link) {
+ 		assert(j++ < 1);

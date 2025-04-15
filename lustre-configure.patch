@@ -1,5 +1,5 @@
---- lustre-release-cac870c/config/lustre-build.m4.orig	2023-12-23 04:15:24.000000000 +0100
-+++ lustre-release-cac870c/config/lustre-build.m4	2024-05-20 20:02:55.285060327 +0200
+--- lustre-release-f7948c6/config/lustre-build.m4.orig	2024-11-27 23:19:27.000000000 +0100
++++ lustre-release-f7948c6/config/lustre-build.m4	2025-04-15 05:42:27.332508008 +0200
 @@ -154,6 +154,7 @@ AC_ARG_ENABLE([modules],
  	])
  AC_MSG_RESULT([$enable_modules ($target_os)])
@@ -16,7 +16,7 @@
  
  			# Run any parallel compile tests
  			LB_PROG_LINUX_SRC
-@@ -509,7 +509,6 @@ AC_ARG_ENABLE([server],
+@@ -513,7 +513,6 @@ AC_ARG_ENABLE([server],
  # before running, so until LB_CONFIG_MODULES can be reorganized, we
  # call it here.
  LB_CONFIG_MODULES
@@ -24,6 +24,19 @@
  LB_CONFIG_LDISKFS
  LB_CONFIG_ZFS
  
+@@ -611,10 +610,10 @@ elif test x$enable_gss = xno ; then
+ 	RPMBINARGS="$RPMBINARGS --without gss"
+ 	AC_SUBST(ENABLE_GSS, no)
+ fi
+-if test x$enable_crypto = xyes ; then
++if test x"$enable_crypto" != xno ; then
+ 	RPMBINARGS="$RPMBINARGS --with crypto"
+ 	AC_SUBST(ENABLE_CRYPTO, yes)
+-elif test x$enable_crypto = xno ; then
++elif test x"$enable_crypto" = xno ; then
+ 	RPMBINARGS="$RPMBINARGS --without crypto"
+ 	AC_SUBST(ENABLE_CRYPTO, no)
+ fi
 --- lustre-release-cac870c/lustre/autoconf/lustre-core.m4.orig	2023-12-23 04:15:24.000000000 +0100
 +++ lustre-release-cac870c/lustre/autoconf/lustre-core.m4	2024-05-20 20:26:24.607425373 +0200
 @@ -286,7 +286,6 @@ AC_ARG_ENABLE([gss_keyring],
@@ -52,3 +65,25 @@
  	      AC_DEFINE(HAVE_LUSTRE_CRYPTO, 1, [Enable Lustre client crypto via embedded llcrypt])
  	      AC_DEFINE(CONFIG_LL_ENCRYPTION, 1, [embedded llcrypt])
  	      AC_DEFINE(HAVE_FSCRYPT_DUMMY_CONTEXT_ENABLED, 1, [embedded llcrypt uses llcrypt_dummy_context_enabled()])
+--- lustre-release-f7948c6/config/lustre-build-linux.m4.orig	2025-04-15 05:38:14.350545196 +0200
++++ lustre-release-f7948c6/config/lustre-build-linux.m4	2025-04-15 05:38:20.513845139 +0200
+@@ -269,7 +269,7 @@ if test "$DEFAULT_LINUX" = "/lib/modules
+ else
+ 	PATHS="/usr/src/linux-headers-$(uname -r)"
+ fi
+-PATHS+=" $DEFAULT_LINUX"
++PATHS="$PATHS $DEFAULT_LINUX"
+ for DEFAULT_LINUX_OBJ in $PATHS; do
+ 	AS_IF([readlink -q -e $DEFAULT_LINUX_OBJ >/dev/null], [break])
+ done
+--- lustre-release-f7948c6/config/lustre-build-zfs.m4.orig	2024-11-27 23:19:27.000000000 +0100
++++ lustre-release-f7948c6/config/lustre-build-zfs.m4	2025-04-15 05:39:12.490230226 +0200
+@@ -783,7 +783,7 @@ your distribution.
+ 				[Have zfs_refcount.h])
+ 		])
+ 		old_EXTRA_KCFLAGS=$EXTRA_KCFLAGS
+-		EXTRA_KCFLAGS+=" -Werror"
++		EXTRA_KCFLAGS="$EXTRA_KCFLAGS -Werror"
+ 		dnl #
+ 		dnl # ZFS 2.2.0 nvpair now returns and expects constant args
+ 		dnl #
